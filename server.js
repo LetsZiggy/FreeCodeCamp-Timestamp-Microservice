@@ -1,77 +1,22 @@
 const http = require('http');
+const fs = require('fs');
 
-let defaultTemplate = `<!DOCTYPE html>
-                       <html>
-                         <head>
-                           <title>FreeCodeCamp - API Projects - Timestamp Microservice</title>
-                           <style>
-                             body {
-                               font-family: Helvetica, sans-serif;
-                               padding: 1rem 2rem;
-                             }
-                             div {
-                               padding-left: 1rem;
-                               margin: 0.5rem;
-                               border-left: 5px solid rgb(235, 235, 235);
-                             }
-                             p {
-                               -webkit-margin-before: 0rem;
-                               -webkit-margin-after: 0rem;
-                               -webkit-margin-start: 0rem;
-                               -webkit-margin-end: 0rem;
-                               margin: 1rem 0rem 0rem 0rem;
-                               text-decoration: underline;
-                             }
-                             ol {
-                               -webkit-margin-before: 0rem;
-                               -webkit-margin-after: 0rem;
-                               -webkit-margin-start: 0rem;
-                               -webkit-margin-end: 0rem;
-                               margin: 0.5rem 0rem 0rem 0rem;
-                             }
-                             li {
-                               font-size: 0.85rem;
-                               margin-bottom: 0.1rem;
-                             }
-                             span {
-                               display: inline-block;
-                               margin: 3px 0rem;
-                               padding: 3px;
-                               font-size: 0.75rem;
-                               color: firebrick;
-                               background-color: rgba(255, 150, 150, 0.1);
-                             }
-                             h3 {
-                               -webkit-margin-before: 0rem;
-                               -webkit-margin-after: 0rem;
-                               -webkit-margin-start: 0rem;
-                               -webkit-margin-end: 0rem;
-                               margin: 1rem 0rem 0rem 0rem;
-                             }
-                           </style>
-                         </head>
-                         <body>
-                           <h1>API Basejump: Timestamp Microservice</h1>
-                           <div>
-                             <p>User stories:</p>
-                             <ol>
-                               <li>I can pass a string as a parameter, and it will check to see whether that string contains either a unix timestamp or a natural  language date (example: January 1, 2016)</li>
-                               <li>If it does, it returns both the Unix timestamp and the natural language form of that date.</li>
-                               <li>If it does not contain a date or Unix timestamp, it returns null for those properties.</li>
-                             </ol>
-                           </div>
-                           <h3>Example usage:</h3>
-                           <span>https://timestamp-ms.herokuapp.com/December%2015,%202015</span>
-                           <br>
-                           <span>https://timestamp-ms.herokuapp.com/1450137600</span>
-                           <h3>Example output:</h3>
-                           <span>{ "unix": 1450137600, "natural": "December 15, 2015" }</span>
-                         </body>
-                       </html>`;
+let months = [
+  ['january', 'jan'],
+  ['february', 'feb'],
+  ['march', 'mar'],
+  ['april', 'apr'],
+  ['may', 'may'],
+  ['june', 'jun'],
+  ['july', 'jul'],
+  ['august', 'aug'],
+  ['september', 'sept'],
+  ['october', 'oct'],
+  ['november', 'nov'],
+  ['december', 'dec']
+];
 
-let months = [['january', 'jan'], ['february', 'feb'], ['march', 'mar'], ['april', 'apr'], ['may'], ['june', 'jun'], ['july', 'jul'], ['august', 'aug'], ['september', 'sept'], ['october', 'oct'], ['november', 'nov'], ['december', 'dec']];
-
-function checkDateInput(date) {
+function checkDateInputOrder(date) {
   let result = [null, null, null];
   for(let i = 0; i < date.length; i++) {
     if(checkIfYear(date[i])) {
@@ -130,7 +75,7 @@ function transformMonth(month) {
   
   for(let i = 0; i < months.length; i++) {
     if(months[i].indexOf(month) !== -1) {
-      return(i);
+      return(months[i][0].charAt(0).toUpperCase() + months[i][0].slice(1));
       break;
     }
   }
@@ -139,41 +84,7 @@ function transformMonth(month) {
 }
 
 function getNaturalDate(query) {
-  if(query.length !== 1) {
-    if(transformMonth(query[0]) !== null) {
-      if(query[1] <= 31 && query[1] <= 9) {
-        query[1] = `0${query[1]}`;
-      }
-      else if(query[2] <= 31 && query[2] <= 9) {
-        query[2] = `0${query[2]}`;
-      }
-      query[0] = transformMonth(query[0]);
-      query[0] = months[query[0]][0].charAt(0).toUpperCase() + months[query[0]][0].slice(1);
-    }
-    else if(transformMonth(query[1]) !== null) {
-      if(query[0] <= 31 && query[0] <= 9) {
-        query[0] = `0${query[0]}`;
-      }
-      else if(query[2] <= 31 && query[2] <= 9) {
-        query[2] = `0${query[2]}`;
-      }
-      query[1] = transformMonth(query[1]);
-      query[1] = months[query[1]][0].charAt(0).toUpperCase() + months[query[1]][0].slice(1);
-    }
-    else if(transformMonth(query[2]) !== null) {
-      if(query[0] <= 31 && query[0] <= 9) {
-        query[0] = `0${query[0]}`;
-      }
-      else if(query[1] <= 31 && query[1] <= 9) {
-        query[1] = `0${query[1]}`;
-      }
-      query[2] = transformMonth(query[2]);
-      query[2] = months[query[2]][0].charAt(0).toUpperCase() + months[query[2]][0].slice(1);
-    }
-    
-    return(`${query[0]} ${query[1]} ${query[2]}`);
-  }
-  else {
+  if(query.length === 1) {
     let date = new Date(query[0] * 1000);
     let dateDate = date.getDate();
     let dateMonth = date.getMonth();
@@ -183,10 +94,42 @@ function getNaturalDate(query) {
       dateDate = `0${dateDate}`;
     }
 
+    console.log(dateMonth);
     dateMonth = months[dateMonth][0];
     dateMonth = dateMonth.charAt(0).toUpperCase() + dateMonth.slice(1);
 
     return(`${dateDate} ${dateMonth} ${dateYear}`);
+  }
+  else {
+    if(transformMonth(query[0]) !== null) {
+      if(query[1] <= 31 && query[1] <= 9) {
+        query[1] = `0${query[1]}`;
+      }
+      else if(query[2] <= 31 && query[2] <= 9) {
+        query[2] = `0${query[2]}`;
+      }
+      query[0] = transformMonth(query[0]);
+    }
+    else if(transformMonth(query[1]) !== null) {
+      if(query[0] <= 31 && query[0] <= 9) {
+        query[0] = `0${query[0]}`;
+      }
+      else if(query[2] <= 31 && query[2] <= 9) {
+        query[2] = `0${query[2]}`;
+      }
+      query[1] = transformMonth(query[1]);
+    }
+    else if(transformMonth(query[2]) !== null) {
+      if(query[0] <= 31 && query[0] <= 9) {
+        query[0] = `0${query[0]}`;
+      }
+      else if(query[1] <= 31 && query[1] <= 9) {
+        query[1] = `0${query[1]}`;
+      }
+      query[2] = transformMonth(query[2]);
+    }
+    
+    return(`${query[0]} ${query[1]} ${query[2]}`);
   }
 }
 
@@ -203,7 +146,7 @@ function determineQuery(query) {
     result.natural = getNaturalDate(extract);
   }
   else {
-    let dateOrder = checkDateInput(extract);
+    let dateOrder = checkDateInputOrder(extract);
     let date = [null, null, null];
 
     for(let i = 0; i < dateOrder.length; i++) {
@@ -225,14 +168,38 @@ function determineQuery(query) {
   return(result);
 }
 
+let html = null;
+let css = null;
+
+fs.readFile('./www/index.html', (err, data) => {
+  if(err) { console.log(err); throw err; }
+  else {
+    html = data;
+  }
+});
+
+fs.readFile('./www/style.css', (err, data) => {
+  if(err) { console.log(err); throw err; }
+  else {
+    css = data;
+  }
+});
+
 let server = http.createServer((req, res) => {
-  let query = determineQuery(req.url);
-  
   if(req.url === '/') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.end(defaultTemplate);
+    res.end(html);
+  }
+  else if(req.url === '/style.css') {
+    res.writeHead(200, { 'Content-Type': 'text/css' });
+    res.end(css);
+  }
+  else if(req.url === '/favicon.ico') {
+    res.writeHead(200, { 'Content-Type': 'image/x-icon' });
+    res.end();
   }
   else {
+    let query = determineQuery(req.url);
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(JSON.stringify(query));
   }
