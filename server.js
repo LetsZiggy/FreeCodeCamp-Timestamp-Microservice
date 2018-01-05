@@ -1,6 +1,23 @@
 const http = require('http');
 const fs = require('fs');
 
+let html = null;
+let css = null;
+
+fs.readFile('./www/index.html', (err, data) => {
+  if(err) { console.log(err); throw err; }
+  else {
+    html = data;
+  }
+});
+
+fs.readFile('./www/style.css', (err, data) => {
+  if(err) { console.log(err); throw err; }
+  else {
+    css = data;
+  }
+});
+
 let months = [
   ['january', 'jan'],
   ['february', 'feb'],
@@ -19,33 +36,18 @@ let months = [
 function checkDateInputOrder(date) {
   let result = [null, null, null];
   for(let i = 0; i < date.length; i++) {
-    if(checkIfYear(date[i])) {
-      if(result[i] === null) {
-        result[i] = 0;
-     }
+    if(Number(date[i]) && date[i] >= 1970 && result[i] === null) {
+      result[i] = 0;
     }
-    else if(checkIfMonth(date[i])) {
-      if(result[i] === null) {
-        result[i] = 1;
-     }
+    else if(checkIfMonth(date[i]) && result[i] === null) {
+      result[i] = 1;
     }
-    else if(checkIfDate(date[i])) {
-      if(result[i] === null) {
-        result[i] = 2;
-     }
+    else if(Number(date[i]) && date[i] <= 31 && result[i] === null) {
+      result[i] = 2;
     }
   }
   
   return(result);
-}
-
-function checkIfYear(year) {
-  if(Number(year) && year >= 1970) {
-    return(true);
-  }
-  else {
-    return(false);
-  }
 }
 
 function checkIfMonth(month) {
@@ -59,15 +61,6 @@ function checkIfMonth(month) {
   }
   
   return(check);
-}
-
-function checkIfDate(date) {
-  if(Number(date) && date <= 31) {
-    return(true);
-  }
-  else {
-    return(false);
-  }
 }
 
 function transformMonth(month) {
@@ -94,14 +87,13 @@ function getNaturalDate(query) {
       dateDate = `0${dateDate}`;
     }
 
-    console.log(dateMonth);
     dateMonth = months[dateMonth][0];
     dateMonth = dateMonth.charAt(0).toUpperCase() + dateMonth.slice(1);
 
     return(`${dateDate} ${dateMonth} ${dateYear}`);
   }
   else {
-    if(transformMonth(query[0]) !== null) {
+    if(checkIfMonth(query[0])) {
       if(query[1] <= 31 && query[1] <= 9) {
         query[1] = `0${query[1]}`;
       }
@@ -110,7 +102,7 @@ function getNaturalDate(query) {
       }
       query[0] = transformMonth(query[0]);
     }
-    else if(transformMonth(query[1]) !== null) {
+    else if(checkIfMonth(query[1])) {
       if(query[0] <= 31 && query[0] <= 9) {
         query[0] = `0${query[0]}`;
       }
@@ -119,7 +111,7 @@ function getNaturalDate(query) {
       }
       query[1] = transformMonth(query[1]);
     }
-    else if(transformMonth(query[2]) !== null) {
+    else if(checkIfMonth(query[2])) {
       if(query[0] <= 31 && query[0] <= 9) {
         query[0] = `0${query[0]}`;
       }
@@ -133,17 +125,12 @@ function getNaturalDate(query) {
   }
 }
 
-function extractQuery(query) {
-  return(query.slice(1).split('%20'));
-}
-
 function determineQuery(query) {
   let result = { unix: null, natural: null };
-  let extract = extractQuery(query);
+  let extract = query.slice(1).split('%20');
 
   if(extract.length === 1) {
     result.unix = extract[0];
-    result.natural = getNaturalDate(extract);
   }
   else {
     let dateOrder = checkDateInputOrder(extract);
@@ -162,28 +149,11 @@ function determineQuery(query) {
     }
 
     result.unix = new Date(date).getTime() / 1000;
-    result.natural = getNaturalDate(extract);
   }
 
+  result.natural = getNaturalDate(extract);
   return(result);
 }
-
-let html = null;
-let css = null;
-
-fs.readFile('./www/index.html', (err, data) => {
-  if(err) { console.log(err); throw err; }
-  else {
-    html = data;
-  }
-});
-
-fs.readFile('./www/style.css', (err, data) => {
-  if(err) { console.log(err); throw err; }
-  else {
-    css = data;
-  }
-});
 
 let server = http.createServer((req, res) => {
   if(req.url === '/') {
