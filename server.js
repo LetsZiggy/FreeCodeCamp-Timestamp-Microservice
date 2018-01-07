@@ -35,16 +35,25 @@ let months = [
 
 function checkDateInputOrder(date) {
   let result = [null, null, null];
+  let checks = { date: false, month: false, year: false };
+
   for(let i = 0; i < date.length; i++) {
     if(Number(date[i]) && date[i] >= 1970 && result[i] === null) {
       result[i] = 0;
+      checks.year = true;
     }
     else if(checkIfMonth(date[i]) && result[i] === null) {
       result[i] = 1;
+      checks.month = true;
     }
     else if(Number(date[i]) && date[i] <= 31 && result[i] === null) {
       result[i] = 2;
+      checks. date = true;
     }
+  }
+  
+  if(!checks.date || !checks.month || !checks.year) {
+    return(null);
   }
   
   return(result);
@@ -128,27 +137,37 @@ function getNaturalDate(query) {
 function determineQuery(query) {
   let result = { unix: null, natural: null };
   let extract = query.slice(1).split('%20');
+  let isNaN = Number(extract[0]);
 
-  if(extract.length === 1) {
+  if(isNaN && extract.length === 1) {
     result.unix = extract[0];
   }
-  else {
+  else if(extract.length === 3) {
     let dateOrder = checkDateInputOrder(extract);
-    let date = [null, null, null];
 
-    for(let i = 0; i < dateOrder.length; i++) {
-      if(dateOrder[i] === 0) {
-        date[0] = extract[i];
-      }
-      else if(dateOrder[i] === 1) {
-        date[1] = extract[i];
-      }
-      else {
-        date[2] = extract[i];
-      }
+    if(dateOrder === null) {
+      return({ unix: null, natural: null });
     }
+    else {
+      let date = [null, null, null];
 
-    result.unix = new Date(date).getTime() / 1000;
+      for(let i = 0; i < dateOrder.length; i++) {
+        if(dateOrder[i] === 0) {
+          date[0] = extract[i];
+        }
+        else if(dateOrder[i] === 1) {
+          date[1] = extract[i];
+        }
+        else {
+          date[2] = extract[i];
+        }
+      }
+
+      result.unix = new Date(date).getTime() / 1000;
+    }
+  }
+  else {
+    return({ unix: null, natural: null });
   }
 
   result.natural = getNaturalDate(extract);
