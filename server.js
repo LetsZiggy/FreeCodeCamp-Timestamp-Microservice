@@ -136,7 +136,7 @@ function getNaturalDate(query) {
 
 function determineQuery(query) {
   let result = { unix: null, natural: null };
-  let extract = query.slice(1).split('%20');
+  let extract = query.split('%20');
   let isNaN = Number(extract[0]);
 
   if(isNaN && extract.length === 1) {
@@ -175,17 +175,18 @@ function determineQuery(query) {
 }
 
 let server = http.createServer((req, res) => {
-  if(req.url === '/') {
+  req.url = req.url.slice(1);
+  if(req.url === '') {
     res.writeHead(200, { 'Content-Type': 'text/html' });
     res.end(html);
   }
-  else if(req.url === '/style.css') {
+  else if(req.url === 'style.css') {
     res.writeHead(200, { 'Content-Type': 'text/css' });
     res.end(css);
   }
-  else if(req.url === '/favicon.ico') {
+  else if(req.url === 'favicon.ico') {
     res.writeHead(200, { 'Content-Type': 'image/x-icon' });
-    res.end('http://cdn.glitch.com/0f4bf29e-ccb0-4d11-82fd-c1e97821d2c0%2Fblog_logo.ico?1515172327041');
+    res.end('https://cdn.glitch.com/0f4bf29e-ccb0-4d11-82fd-c1e97821d2c0%2Fblog_logo.ico?1515172327041');
   }
   else {
     let query = determineQuery(req.url);
