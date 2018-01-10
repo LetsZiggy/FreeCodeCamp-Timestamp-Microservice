@@ -1,3 +1,8 @@
+/**
+***  RESOURCES:
+***    Number() vs parseInt() ---> https://stackoverflow.com/a/4564199/7641789
+**/
+
 const http = require('http');
 const fs = require('fs');
 
@@ -193,7 +198,7 @@ let server = http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.end(JSON.stringify(query));
   }
-}).on('error', (err) => { console.lg(err); throw err; });
+}).on('error', (err) => { console.log(err); throw err; });
 
 let listener = server.listen(process.env.PORT, () => {
   console.log('Your app is listening on port ' + listener.address().port);
