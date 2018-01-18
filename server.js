@@ -66,6 +66,7 @@ function checkDateInputOrder(date) {
 
 function checkIfMonth(month) {
   let check = false;
+  month = month.toLowerCase();
   
   for(let i = 0; i < months.length; i++) {
     if(months[i].indexOf(month) !== -1) {
