@@ -10,22 +10,24 @@
     <link id="favicon" rel="icon" type="image/x-icon" href="favicon.ico">
   </head>
   <body>
-    <h1>API Basejump: Timestamp Microservice</h1>
-    <div>
-      <p>User stories:</p>
-      <ol>
-        <li>I can pass a string as a parameter, and it will check to see whether that string contains either a unix timestamp or a natural language date
-          <br>(example: 15 Jan(uary) 2016 || Jan(uary) 15 2016 || 2016 Jan(uary) 15)</li>
-        <li>If it does, it returns both the Unix timestamp and the natural language form of that date</li>
-        <li>If it does not contain a date or Unix timestamp, it returns null for those properties</li>
-      </ol>
+    <div id="content">
+      <h1>API Basejump: Timestamp Microservice</h1>
+      <div>
+        <p>User stories:</p>
+        <ol>
+          <li>I can pass a string as a parameter, and it will check to see whether that string contains either a unix timestamp or a natural language date
+            <br>(example: 15 Jan(uary) 2016 || Jan(uary) 15 2016 || 2016 Jan(uary) 15)</li>
+          <li>If it does, it returns both the Unix timestamp and the natural language form of that date</li>
+          <li>If it does not contain a date or Unix timestamp, it returns null for those properties</li>
+        </ol>
+      </div>
+      <h3>Example usage:</h3>
+      <span>https://letsziggy-freecodecamp-timestamp-microservice.glitch.me/15%20January%202016</span>
+      <br>
+      <span>https://letsziggy-freecodecamp-timestamp-microservice.glitch.me/1452816000</span>
+      <h3>Example output:</h3>
+      <span>{ "unix": 1452816000, "natural": "15 January 2016" }</span>
     </div>
-    <h3>Example usage:</h3>
-    <span>https://letsziggy-freecodecamp-timestamp-microservice.glitch.me/15%20January%202016</span>
-    <br>
-    <span>https://letsziggy-freecodecamp-timestamp-microservice.glitch.me/1452816000</span>
-    <h3>Example output:</h3>
-    <span>{ "unix": 1452816000, "natural": "15 January 2016" }</span>
     <div id="footer">
       <div id="footer-note">Written by <a class="footer-link" href="https://www.freecodecamp.org/letsziggy" target="_blank">LetsZiggy</a> for <a class="footer-link" href="https://www.freecodecamp.org/challenges/timestamp-microservice" target="_blank">FreeCodeCamp Challenge</a>.</div>
     </div>
