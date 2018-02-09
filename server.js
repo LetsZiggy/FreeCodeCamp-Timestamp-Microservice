@@ -2,7 +2,7 @@
 ***  RESOURCES:
 ***    Number() vs parseInt() ---> https://stackoverflow.com/a/4564199/7641789
 **/
-console.log('te');
+
 const http = require('http');
 const fs = require('fs');
 
